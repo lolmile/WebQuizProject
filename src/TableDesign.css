@@ -1,0 +1,14 @@
+td {
+    border: 1px solid #c4bebd;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 30px;
+    padding-right: 40px;
+}
+th {
+    border: 1px solid #040404;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 30px;
+    padding-right: 40px;
+}
