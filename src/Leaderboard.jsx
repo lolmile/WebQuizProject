@@ -1,7 +1,37 @@
+import { useEffect } from "react"
+import { useState } from "react"
 import { Link } from "react-router-dom"
+import {token, top10route} from './constants.js'
 import './TableDesign.css'
 
 function Leaderboard() {
+
+    const [scores, setScores] = useState([])
+
+    useEffect(() => {
+        //Called upon component mount
+        fetchScores()
+    }, [])
+
+    async function fetchScores(){
+
+        const options = {
+            method: "GET",
+            headers: {
+                "Authorization": token
+            }
+        }
+
+
+        const response = await fetch(top10route, options)
+
+        console.log('responce.status: ', response.status);
+
+        const data = await response.json();
+        console.log('data: ', data);
+
+        setScores(data)
+    }
 
     return (
     <div>
@@ -10,7 +40,7 @@ function Leaderboard() {
             <button className="btn btn-secondary px-5 py-4 fs-3" style={{float: "right", marginRight: "120px"}}>Replay</button>
             </Link>
         </div>
-        <div class="text-center">
+        <div className="text-center">
             <h1 className='' style={{ marginTop: "75px",marginLeft: "130px", marginBottom: "80px"}}>Top Scores</h1>
         </div>
         <div className="container">

@@ -8,7 +8,7 @@ function Play() {
       <div>
         <span className='fs-3' style={{textAlign: "left"}}>Q. 1/10</span>
         <Link to="/">
-        <button className="btn btn-secondary m-2 px-4 py-2" style={{float: "right"}}>Stop</button>
+          <button class="btn btn-secondary px-3 py-2 fs-4" style={{float: "right", marginRight: "20px", marginTop: "20px"}}>Stop</button>
         </Link>
       </div>
         <div class="text-center">
