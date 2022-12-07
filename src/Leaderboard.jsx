@@ -2,7 +2,7 @@ import { useEffect } from "react"
 import { useState } from "react"
 import { Link } from "react-router-dom"
 import {token, top10route} from './constants.js'
-import './TableDesign.css'
+import Row from "./Row.jsx"
 
 function Leaderboard() {
 
@@ -22,13 +22,8 @@ function Leaderboard() {
             }
         }
 
-
         const response = await fetch(top10route, options)
-
-        console.log('responce.status: ', response.status);
-
         const data = await response.json();
-        console.log('data: ', data);
 
         setScores(data)
     }
@@ -41,7 +36,7 @@ function Leaderboard() {
             </Link>
         </div>
         <div className="text-center">
-            <h1 className='' style={{ marginTop: "75px",marginLeft: "130px", marginBottom: "80px"}}>Top Scores</h1>
+            <h1 className='' style={{ marginTop: "75px",marginLeft: "304px", marginBottom: "70px"}}>Top Scores</h1>
         </div>
         <div className="container">
             <div className="row">
@@ -53,56 +48,11 @@ function Leaderboard() {
                             <th>Category</th>
                             <th>Score</th>
                         </tr>
-                        <tr>
-                            <td>Jane Doe</td>
-                            <td>History</td>
-                            <td>9</td>
-                        </tr>
-                        <tr>
-                            <td>Mary</td>
-                            <td>Geography</td>
-                            <td>7</td>
-                        </tr>
-                        <tr>
-                            <td>&nbsp;</td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>&nbsp;</td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>&nbsp;</td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>&nbsp;</td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>&nbsp;</td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>&nbsp;</td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>&nbsp;</td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>&nbsp;</td>
-                            <td></td>
-                            <td></td>
-                        </tr>
+                        {
+                            scores.map((data, index) => {
+                                return <Row key = {index} name = {data.name} category = {data.categoryName} score = {data.score}/>
+                            })
+                        }
                     </table>
                 </div>
                 <div className="col-2"></div>
