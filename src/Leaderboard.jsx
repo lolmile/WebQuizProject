@@ -43,16 +43,20 @@ function Leaderboard() {
                 <div className="col-2"></div>
                 <div className="col text-center my-3">
                     <table style={{width: "100%", border:"1px solid black"}}>
+                        <thead>
                         <tr>
                             <th>Name</th>
                             <th>Category</th>
                             <th>Score</th>
                         </tr>
+                        </thead>
+                        <tbody>
                         {
                             scores.map((data, index) => {
                                 return <Row key = {index} name = {data.name} category = {data.categoryName} score = {data.score}/>
                             })
                         }
+                        </tbody>
                     </table>
                 </div>
                 <div className="col-2"></div>

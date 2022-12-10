@@ -1,13 +1,13 @@
-import PropTypes from 'prop-types'
-import React, { Component } from 'react'
-import { useEffect } from 'react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom'
 import { postScoreRoute, token } from './constants'
 
-function Result(){
+function Result(props){
 
     const [name, setName] = useState('');
+    const categoryid = localStorage.getItem('categoryid')
+    const categoryName = localStorage.getItem('categoryName')
+    const numCategoryID = parseInt(categoryid)
 
     const handleChange = event => {
         setName(event.target.value)
@@ -22,10 +22,10 @@ function Result(){
                 'authorization': token
             },
             body: JSON.stringify({
-                score: 10,
+                score: props.score,
                 name: name,
-                categoryId: 24,
-                categoryName: "theory"
+                categoryId: numCategoryID,
+                categoryName: categoryName 
             })
         }
 
@@ -34,9 +34,10 @@ function Result(){
 
 
     return (
-        <><div className="text-center">
+        <>
+        <div className="text-center">
             <h1 className='m-5'>Completed!</h1>
-            <h2>Your Score is X/10</h2>
+            <h2>Your Score is {props.score}/10</h2>
         </div>
         <div className="container">
             <div className="row">

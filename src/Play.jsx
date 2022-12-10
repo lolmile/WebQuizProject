@@ -1,32 +1,100 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-import Button from './Button'
+import React, { useEffect, useState } from 'react'
+import Question from './Question';
+import Spinner from './Spinner';
+import Result from './Result';
+import { openTDhost } from './constants';
 
 function Play() {
-  return (
-    <div>
-      <div>
-        <span className='fs-3' style={{textAlign: "left"}}>Q. 1/10</span>
-        <Link to="/">
-          <button class="btn btn-secondary px-3 py-2 fs-4" style={{float: "right", marginRight: "20px", marginTop: "20px"}}>Stop</button>
-        </Link>
-      </div>
-        <div class="text-center">
-            <h1 className='m-5'>History Quiz</h1>
-            <h2>1. What is the capital of Hungary?</h2>
+
+    const [activeQuestionIndex, setActiveQuestionIndex] = useState(0);
+    const [questions, setQuestions] = useState([]);
+    const [quizFinished, setQuizFinished] = useState(false);
+    const [score, setScore] = useState(0);
+    const [isLoading, setIsLoading] = useState(false);
+    const [selectedCategory, setSelectedCategory] = useState({ name: localStorage.getItem('categoryName'), id: localStorage.getItem('categoryid') });
+
+    const numberOfQuestions = 10;
+
+    useEffect(() => {
+
+        if (!selectedCategory) {
+            return
+        }
+
+        const url = `${openTDhost}?amount=${numberOfQuestions}&category=${selectedCategory.id}&difficulty=easy`
+
+        setIsLoading(true);
+
+        async function fetchTrivia() {
+
+            const triviaResponse = await fetch(url);
+
+            const body = await triviaResponse.json();
+
+            if (body.results) {
+                setQuestions(body.results);
+            }
+
+            setTimeout(() => {
+                setIsLoading(false);
+            }, 500)
+        }
+
+        fetchTrivia();
+
+    }, [selectedCategory])
+
+    function selectAnswerHandler(answer) {
+        setIsLoading(true);
+
+        if (answer.correct) {
+            setScore((value) => value + 1); // increment score
+        }
+
+        if (activeQuestionIndex === numberOfQuestions - 1) {
+            // last question
+            setQuizFinished(true);
+        } else {
+            // next question
+            setActiveQuestionIndex((value) => value + 1);
+        }
+
+        setTimeout(() => {
+            setIsLoading(false);
+        }, 200)
+    }
+
+    return (
+        <div className='container rounded p-4 my-2' style={{ backgroundColor: "#c0deff" }}>
+            <div className="row">
+                {
+                    isLoading ? <Spinner light={true} size={4}></Spinner>
+                        : (questions.length === 0 ? <></> :
+                            <>
+                                {!quizFinished ?
+                                    <div className="container">
+                                        <div className="row">
+                                            <div className="col-12 text-center h1 mb-5">{selectedCategory.name}</div>
+                                        </div>
+                                        <div className="row">
+                                            <div className="col-12 text-center h2">Question {activeQuestionIndex + 1}/{numberOfQuestions}</div>
+                                        </div>
+                                        <div className="row">
+                                            <Question question={questions[activeQuestionIndex].question} correct_answer={questions[activeQuestionIndex].correct_answer} incorrect_answers={questions[activeQuestionIndex].incorrect_answers} selectAnswerHandler={selectAnswerHandler}
+                                            ></Question>
+                                        </div>
+                                    </div> : <>
+                                        {/* Score/result component */}
+                                        <div className="container text-center">
+                                            <Result score={score} category={selectedCategory} />
+                                        </div>
+                                    </>
+                                }
+                            </>)}
+            </div>
+
         </div>
-        <div className='container'>
-          <div className="row my-5">
-            <div className="col text-end me-5"><Button text = "Option 1"/></div>
-            <div className="col"><Button text = "Option 2"/></div>
-          </div>
-          <div className="row mt-5">
-            <div className="col text-end me-5"><Button text = "Option 3"/></div>
-            <div className="col"><Button text = "Option 4"/></div>
-          </div>
-        </div>
-    </div>
-  )
+    )
 }
 
 export default Play

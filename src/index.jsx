@@ -17,7 +17,6 @@ root.render(
         <Route path="/selectCategory" element={<SelectCategory />} />
         <Route path="/play" element={<Play />} />
         <Route path="/leaderboard" element={<Leaderboard />} />
-        <Route path="/result" element={<Result />} />
     </Routes>
   </BrowserRouter>
 );
