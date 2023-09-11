@@ -1,8 +1,12 @@
 import React from "react";
+import { Link } from "react-router-dom"; // Import Link from react-router-dom
 
 function JoinQuiz() {
   return (
     <>
+      <Link to="/">
+        <h1>🧙🏼</h1>
+      </Link>
       <h1 className="text-center mt-3">Join Qwiz</h1>
       <div className="container">
         <div className="row mb-5"></div>
