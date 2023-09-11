@@ -1,5 +1,4 @@
 import React from 'react'
-import './TableDesign.css'
 
 function Row(props) {
   return ( 
