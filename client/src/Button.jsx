@@ -2,9 +2,6 @@ import React from 'react'
 
 function Button(props) {
 
-  function ChangeAnswers(newValue){
-    props.changeAnswer(newValue)
-}
 
   return (
     
