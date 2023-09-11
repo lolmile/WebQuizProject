@@ -9,20 +9,20 @@ import SelectCategory from './SelectCategory';
 import { BrowserRouter, Routes,Route } from "react-router-dom";
 import Multiplayer from './SocketIO/Multiplayer';
 import MultiplayerChoice from './SocketIO/MultiplayerChoice';
+import JoinQuiz from './JoinQuiz';
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <BrowserRouter>
     <Routes>
-        <Route path='/' element={<Home />} />
+        <Route path="/" element={<Home />} />
         <Route path="/selectCategory" element={<SelectCategory />} />
         <Route path="/play" element={<Play />} />
         <Route path="/leaderboard" element={<Leaderboard />} />
-
+        <Route path="join" element={<JoinQuiz />} />
         <Route path='multiplayer' element={<Multiplayer/>}>
           <Route path='choice' element={<MultiplayerChoice/>}/>
-
         </Route>
     </Routes>
   </BrowserRouter>
