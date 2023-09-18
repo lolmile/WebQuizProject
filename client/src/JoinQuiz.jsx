@@ -23,11 +23,16 @@ function JoinQuiz() {
                 <input
                   type="text"
                   className="form-control mt-3"
-                  id="code"
+                  id="roomIdInput"
                   placeholder="Enter Room ID"
                 />
+                <input
+                  type="text"
+                  className="form-control mt-3"
+                  id="usernameInput"
+                  placeholder="Enter Username"
+                />
                 <button
-                  type="submit"
                   className="btn btn-lg btn-success mt-3 w-50"
                 >
                   Join
