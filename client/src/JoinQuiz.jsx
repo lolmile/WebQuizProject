@@ -1,29 +1,38 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom"; // Import Link from react-router-dom
-import io from "socket.io-client"; // Import socket.io-client
+import { Link } from "react-router-dom";
+import io from "socket.io-client";
 
 function JoinQuiz() {
   const [roomId, setRoomId] = useState("");
   const [username, setUsername] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
-
   const handleJoinQuiz = () => {
+    // Check for empty inputs
+    if (!roomId || !username) {
+      setErrorMessage("Please enter both a Room ID and a Username.");
+      //wait 3 seconds and then remove the error message
+      setTimeout(() => {
+        setErrorMessage("");
+      }, 5000);
+      return;
+    }
+
     // Connect to the Socket.io server
-    const socket = io("http://localhost:5000"); // Replace with your server's URL
-    
+    const socket = io("http://localhost:3000");
+
     // Emit the 'JoinQuiz' event with the entered room ID and username
-    socket.emit('JoinQuiz', { quizId: roomId, username });
-    
+    socket.emit("JoinQuiz", { quizId: roomId, username });
+
     // Listen for the server's response
-    socket.on('JoinedQuiz', ({ quizId }) => {
+    socket.on("JoinedQuiz", ({ quizId }) => {
       // Successfully joined the quiz, you can redirect or perform any other actions here
       console.log(`Joined Quiz ${quizId}`);
       // Redirect the user to the quiz room or perform other actions
     });
 
     // Listen for errors
-    socket.on('Error', ({ message }) => {
+    socket.on("Error", ({ message }) => {
       setErrorMessage(message);
     });
   };
@@ -51,12 +60,16 @@ function JoinQuiz() {
                   className="form-control mt-3"
                   id="roomIdInput"
                   placeholder="Enter Room ID"
+                  value={roomId}
+                  onChange={(e) => setRoomId(e.target.value)}
                 />
                 <input
                   type="text"
                   className="form-control mt-3"
                   id="usernameInput"
                   placeholder="Enter Username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                 />
                 <button
                   className="btn btn-lg btn-success mt-3 w-50"
@@ -66,6 +79,9 @@ function JoinQuiz() {
                 </button>
               </div>
             </form>
+            {errorMessage && (
+              <p className="text-danger mt-3">{errorMessage}</p>
+            )}
           </div>
         </div>
       </div>
