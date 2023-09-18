@@ -21,7 +21,7 @@ root.render(
         <Route path="/selectCategory" element={<SelectCategory />} />
         <Route path="/play" element={<Play />} />
         <Route path="/leaderboard" element={<Leaderboard />} />
-        <Route path="join" element={<JoinQuiz />} />
+        <Route path="/join" element={<JoinQuiz />} />
         <Route path='multiplayer' element={<Multiplayer/>}>
           <Route path='choice' element={<MultiplayerChoice/>}/>
 

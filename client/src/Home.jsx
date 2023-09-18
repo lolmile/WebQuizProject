@@ -42,10 +42,11 @@ function Home(){
             <img src={myImage} alt="Wizzard" style={imageStyle}/>
         </div>
         <Link to="/selectCategory">
-        <button className="btn btn-success px-5 py-2 fs-4 mt-5">Create Room</button>
-        <button className="btn btn-success px-5 py-2 fs-4 mt-5 ms-5">Join Room</button>
+          <button className="btn btn-success px-5 py-2 fs-4 mt-5">Create Room</button>
         </Link>
-
+        <Link to="/join">
+          <button className="btn btn-success px-5 py-2 fs-4 mt-5 ms-5">Join Room</button>
+        </Link>
     </div>
     </>
 }
