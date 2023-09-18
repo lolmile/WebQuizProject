@@ -41,10 +41,11 @@ io.on('connection', (socket) => {
 
     socket.on('JoinQuiz', (data) => {
         const quizId = data.quizId;
+        const username = data.username;
         const quiz = activeQuizzes.get(quizId);
 
         if (quiz) {
-            quiz.players.push(socket.id);
+            quiz.players.push({ socketId: socket.id, username });
             socket.join(quizId);
             socket.emit('JoinedQuiz', { quizId });
         } else {
