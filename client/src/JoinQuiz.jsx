@@ -1,7 +1,33 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom"; // Import Link from react-router-dom
+import io from "socket.io-client"; // Import socket.io-client
 
 function JoinQuiz() {
+  const [roomId, setRoomId] = useState("");
+  const [username, setUsername] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
+
+  const handleJoinQuiz = () => {
+    // Connect to the Socket.io server
+    const socket = io("http://localhost:5000"); // Replace with your server's URL
+    
+    // Emit the 'JoinQuiz' event with the entered room ID and username
+    socket.emit('JoinQuiz', { quizId: roomId, username });
+    
+    // Listen for the server's response
+    socket.on('JoinedQuiz', ({ quizId }) => {
+      // Successfully joined the quiz, you can redirect or perform any other actions here
+      console.log(`Joined Quiz ${quizId}`);
+      // Redirect the user to the quiz room or perform other actions
+    });
+
+    // Listen for errors
+    socket.on('Error', ({ message }) => {
+      setErrorMessage(message);
+    });
+  };
+
   return (
     <>
       <div className="top-left-emoji">
@@ -34,6 +60,7 @@ function JoinQuiz() {
                 />
                 <button
                   className="btn btn-lg btn-success mt-3 w-50"
+                  onClick={handleJoinQuiz}
                 >
                   Join
                 </button>
