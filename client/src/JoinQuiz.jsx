@@ -1,11 +1,14 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom"; // Import useHistory
 import io from "socket.io-client";
 
 function JoinQuiz() {
   const [roomId, setRoomId] = useState("");
   const [username, setUsername] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  
+  // Initialize useHistory
+  const history = useHistory();
 
   const handleJoinQuiz = () => {
     // Check for empty inputs
@@ -26,9 +29,9 @@ function JoinQuiz() {
 
     // Listen for the server's response
     socket.on("JoinedQuiz", ({ quizId }) => {
-      // Successfully joined the quiz, you can redirect or perform any other actions here
+      // Successfully joined the quiz, redirect the user to the waiting room
       console.log(`Joined Quiz ${quizId}`);
-      // Redirect the user to the quiz room or perform other actions
+      history.push(`/waiting-room/${quizId}`); // Redirect to the waiting room with the quiz ID
     });
 
     // Listen for errors
@@ -37,56 +40,56 @@ function JoinQuiz() {
     });
   };
 
-  return (
-    <>
-      <div className="top-left-emoji">
-        <Link to="/" className="link-no-style">
-          <h1>🧙🏼</h1>
-        </Link>
-      </div>
-      <h1 className="text-center mt-3">Join Qwiz</h1>
-      <div className="container">
-        <div className="row mb-5"></div>
-        <div className="row mb-5"></div>
-        <div className="row">
-          <div className="col text-center">
-            <form className="d-flex flex-column align-items-center">
-              <div className="form-group">
-                <label htmlFor="code" className="fs-2">
-                  Room ID
-                </label>
-                <input
-                  type="text"
-                  className="form-control mt-3"
-                  id="roomIdInput"
-                  placeholder="Enter Room ID"
-                  value={roomId}
-                  onChange={(e) => setRoomId(e.target.value)}
-                />
-                <input
-                  type="text"
-                  className="form-control mt-3"
-                  id="usernameInput"
-                  placeholder="Enter Username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                />
-                <button
-                  className="btn btn-lg btn-success mt-3 w-50"
-                  onClick={handleJoinQuiz}
-                >
-                  Join
-                </button>
-              </div>
-            </form>
-            {errorMessage && (
-              <p className="text-danger mt-3">{errorMessage}</p>
-            )}
+    return (
+      <>
+        <div className="top-left-emoji">
+          <Link to="/" className="link-no-style">
+            <h1>🧙🏼</h1>
+          </Link>
+        </div>
+        <h1 className="text-center mt-3">Join Qwiz</h1>
+        <div className="container">
+          <div className="row mb-5"></div>
+          <div className="row mb-5"></div>
+          <div className="row">
+            <div className="col text-center">
+              <form className="d-flex flex-column align-items-center">
+                <div className="form-group">
+                  <label htmlFor="code" className="fs-2">
+                    Room ID
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control mt-3"
+                    id="roomIdInput"
+                    placeholder="Enter Room ID"
+                    value={roomId}
+                    onChange={(e) => setRoomId(e.target.value)}
+                  />
+                  <input
+                    type="text"
+                    className="form-control mt-3"
+                    id="usernameInput"
+                    placeholder="Enter Username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                  />
+                  <button
+                    className="btn btn-lg btn-success mt-3 w-50"
+                    onClick={handleJoinQuiz}
+                  >
+                    Join
+                  </button>
+                </div>
+              </form>
+              {errorMessage && (
+                <p className="text-danger mt-3">{errorMessage}</p>
+              )}
+            </div>
           </div>
         </div>
-      </div>
-    </>
-  );
-}
+      </>
+    );
+  }
 
-export default JoinQuiz;
+  export default JoinQuiz;
