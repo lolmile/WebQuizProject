@@ -1,11 +1,13 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {Link, useNavigate} from "react-router-dom"
 import spellImage from "./img/spell.png";
 import { SocketContext } from "./SocketIO/SocketContext";
+import { io } from 'socket.io-client';
 
 function SelectCategory(){
 
   const [categoryList, setCategoryList] = useState([])
+  const [socket, setSocket] = useState(null);
   const [category, setCategory] = useState()
   const [numQuestions, setNumQuestions] = useState()
   const [timerPerQuestion, setTimePerQuestion] = useState()
@@ -13,18 +15,17 @@ function SelectCategory(){
 
   const numList = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
   const difficultyList = ['Any', 'Easy', 'Medium', 'Hard']
-
-  const socket = useContext(SocketContext)
-  const navigate = useNavigate()
+  const SERVER_HOST = "http://localhost:5000";
 
   useEffect(() => {
+
+    const newSocket = io(SERVER_HOST);
+
+    newSocket.on("connect", () => {
+      console.log("Connected to WS server");
+      setSocket(newSocket);
+    });
     
-    if (!socket){
-      return
-    }
-
-    navigate("/Multiplayer")
-
     // Function to fetch categories
     const fetchCategories = async () => {
       try {
@@ -43,7 +44,7 @@ function SelectCategory(){
     };
     
     fetchCategories();
-  }, [socket]); 
+  }, []); 
 
   const handleCategorySelect = (category) => {
     setCategory(category);
@@ -62,14 +63,12 @@ function SelectCategory(){
   };
 
   const createQuiz = () => {
-    console.log("test");
     const options = {
-      numOfQuestion: numQuestions,
+      numOfQuestions: numQuestions,
       category: category,
       difficulty: difficulty,
       timePerQuestion: timerPerQuestion
     }
-    console.log('socket: ', socket);
     socket.emit("getQuestion", options)
   }
 
@@ -77,7 +76,7 @@ function SelectCategory(){
         <>
       <div className="top-left-emoji">
         <Link to="/" className="link-no-style">
-          <h1>??</h1>
+          <h1>Back</h1>
         </Link>
       </div>
         <div className="mt-2 text-center fs-1">

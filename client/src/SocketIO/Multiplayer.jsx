@@ -15,7 +15,6 @@ function Multiplayer() {
     newSocket.on("connect", () => {
       console.log("Connected to WS server");
       setSocket(newSocket);
-      navigate("/selectCategory");
     });
 
     // Clean up socket connection on component unmount

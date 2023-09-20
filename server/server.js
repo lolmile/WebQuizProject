@@ -4,6 +4,7 @@ const socketIo = require('socket.io');
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, { cors: { origin: 'http://localhost:3000' } });
+const axios = require('axios');
 
 // To keep track of the active quizzes
 const activeQuizzes = new Map();
@@ -79,6 +80,35 @@ io.on('connection', (socket) => {
 
         socket.emit('leftQuiz'); // Lets waiting room know they players has disconnected
     });
+
+    socket.on("getQuestion", async (options) => {
+
+        let apiLink = "https://opentdb.com/api.php?"
+
+        if (options.numOfQuestions) {
+            apiLink = apiLink + "amount=" + options.numOfQuestions
+        }else {
+            return
+        }
+
+        if (options.category){
+            apiLink = apiLink + "&category=" + options.category 
+        }
+
+        if (options.difficulty){
+            apiLink = apiLink + "&difficulty=" + options.difficulty 
+        }
+
+        const timePerQuestion = options.timePerQuestion
+        const question = await fetchQuestions(apiLink)
+        
+        const quizData = {
+            question: question,
+            timePerQuestion: timePerQuestion
+        }
+
+        socket.emit()
+    })
 });
 
 // To generate unique 6 digit quiz ID
@@ -107,31 +137,19 @@ server.listen(PORT, () => {
     console.log(`Server listening on: http://localhost:${PORT}`);
 });
 
-async function getQuestion(options){
-
+async function fetchQuestions(apiLink) {
     try {
-        if (!options) {
-          throw new Error('Options object is undefined');
-        }    
-
-        const numOfQuestion = options.numOfQuestion
-        const category = options.category
-        const difficulty = options.difficulty
-
-        let apiLink = "https://opentdb.com/api.php?amount="
-
-        if (parseInt(numOfQuestion) > 0){
-            apiLink += numOfQuestion
-        }
-        
-        console.log('apiLink: ', apiLink);
-
-        const responce = await fetch()
-
+      const response = await axios.get(apiLink);
+  
+      if (response.status === 200) {
+        return response.data;
+      } else {
+        throw new Error("Failed to fetch categories");
+      }
     } catch (error) {
-    console.error('Error in getQuestion:', error.message);
-    // Handle the error, such as logging or displaying an error message
+      console.error(error);
+      // If you want to propagate the error, you can re-throw it here:
+      throw error;
     }
-}
-
+  }
 
