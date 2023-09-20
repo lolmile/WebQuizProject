@@ -10,22 +10,15 @@ function WaitingRoom() {
   useEffect(() => {
     const socket = io("http://localhost:5000");
 
-    /* socket.emit("quizJoined", { quizId }); */
+    console.log("username", username)
+    // join quiz
+    socket.emit("JoinQuiz", { quizId, username });
 
-    // get player list 
-    socket.emit("PlayerList", { quizId });
-    socket.on("PlayerList", ({ players }) => {
-      setPlayers(players);
-    });
-    
-    // Refresh player list when a player leaves
-    socket.on("leftQuiz", () => {
-      socket.emit("PlayerList", { quizId });
+    socket.on("UpdatePlayers", (data) => {
+      setPlayers(data.players);
     });
 
-    
-    
-    
+   
     // Clean up the socket connection when unmounting
     return () => {
       socket.disconnect();
