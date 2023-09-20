@@ -1,14 +1,9 @@
 const express = require('express');
 const http = require('http');
-const cors = require('cors');
 const socketIo = require('socket.io');
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server,{
-    cors: {
-        origin: ['http://127.0.0.1:5173', 'http://localhost:5173', 'http://localhost:3000'],
-    }
-});
+const io = socketIo(server, { cors: { origin: 'http://localhost:3000' } });
 
 // To keep track of the active quizzes
 const activeQuizzes = new Map();
@@ -17,12 +12,6 @@ const activeQuizzes = new Map();
 app.get('/', (req, res) => {
     io.emit('message', 'Hello World!');
     res.send('OK');
-});
-
-// Start the server
-const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => {
-    console.log(`Server listening on port ${PORT}`);
 });
 
 io.on('connection', (socket) => {
@@ -48,6 +37,7 @@ io.on('connection', (socket) => {
             quiz.players.push({ socketId: socket.id, username });
             socket.join(quizId);
             socket.emit('JoinedQuiz', { quizId });
+            console.log(`${username} joined quiz ${quizId}`);
         } else {
             socket.emit('Error', { message: 'Quiz does not exist' });
         }
@@ -67,3 +57,23 @@ function generateUniqueQuizId() {
     }
     return quizId;
 }
+
+// Create a test room with room ID "1234"
+const testRoomId = '1234';
+const testQuiz = {
+    quizId: testRoomId,
+    creator: null, // Set the creator to null for the test room
+    players: [],
+    questions: [], // You can add test questions here if needed
+};
+activeQuizzes.set(testRoomId, testQuiz);
+
+// Start the server
+const PORT = process.env.PORT || 5000;
+server.listen(PORT, () => {
+    console.log(`Server listening on: http://localhost:${PORT}`);
+});
+
+
+
+

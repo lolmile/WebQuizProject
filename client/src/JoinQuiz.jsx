@@ -20,9 +20,10 @@ function JoinQuiz() {
       }, 5000);
       return;
     }
-
+    
+    
     // Connect to the Socket.io server
-    const socket = io("http://localhost:3000");
+    const socket = io("http://localhost:5000");
 
     // Emit the 'JoinQuiz' event with the entered room ID and username
     socket.emit("JoinQuiz", { quizId: roomId, username });
@@ -31,7 +32,6 @@ function JoinQuiz() {
     socket.on("JoinedQuiz", ({ quizId }) => {
       // Successfully joined the quiz, redirect the user to the waiting room
       console.log(`Joined Quiz ${quizId}`);
-      navigate(`/waiting-room/${quizId}`); // Redirect to the waiting room with the quiz ID
     });
 
     // Listen for errors
@@ -44,7 +44,7 @@ function JoinQuiz() {
       <>
         <div className="top-left-emoji">
           <Link to="/" className="link-no-style">
-            <h1>????</h1>
+            <h1>Back</h1>
           </Link>
         </div>
         <h1 className="text-center mt-3">Join Qwiz</h1>
@@ -75,6 +75,7 @@ function JoinQuiz() {
                     onChange={(e) => setUsername(e.target.value)}
                   />
                   <button
+                    type="button"
                     className="btn btn-lg btn-success mt-3 w-50"
                     onClick={handleJoinQuiz}
                   >
