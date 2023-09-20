@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useHistory } from "react-router-dom"; // Import useHistory
+import { useNavigate, Link } from 'react-router-dom';
 import io from "socket.io-client";
 
 function JoinQuiz() {
@@ -8,7 +8,7 @@ function JoinQuiz() {
   const [errorMessage, setErrorMessage] = useState("");
   
   // Initialize useHistory
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const handleJoinQuiz = () => {
     // Check for empty inputs
@@ -31,7 +31,7 @@ function JoinQuiz() {
     socket.on("JoinedQuiz", ({ quizId }) => {
       // Successfully joined the quiz, redirect the user to the waiting room
       console.log(`Joined Quiz ${quizId}`);
-      history.push(`/waiting-room/${quizId}`); // Redirect to the waiting room with the quiz ID
+      navigate(`/waiting-room/${quizId}`); // Redirect to the waiting room with the quiz ID
     });
 
     // Listen for errors
