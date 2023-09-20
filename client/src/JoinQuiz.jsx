@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from 'react-router-dom';
-import io from "socket.io-client";
+import io, { Socket } from "socket.io-client";
 
 function JoinQuiz() {
   const [roomId, setRoomId] = useState("");
@@ -9,7 +9,7 @@ function JoinQuiz() {
   
   // Initialize useHistory
   const navigate = useNavigate();
-
+  
   const handleJoinQuiz = () => {
     // Check for empty inputs
     if (!roomId || !username) {
@@ -20,8 +20,20 @@ function JoinQuiz() {
       }, 5000);
       return;
     }
-    // navigate to waiting room
-    navigate(`/waiting-room/${roomId}`, {state: { username } }); // Navigate to the WaitingRoom with the quiz ID and username as URL parameters
+
+    const socket = io("http://localhost:5000");
+
+    socket.emit("ValidateInputs", { quizId: roomId, username }, (data) => {
+      if (data.error) {
+        setErrorMessage(data.msg);
+        //wait 3 seconds and then remove the error message
+        setTimeout(() => {
+          setErrorMessage("");
+        }, 5000);
+      } else {
+        navigate(`/waiting-room/${roomId}`, {state: { username } }); // Navigate to the WaitingRoom with the quiz ID and username as URL parameters
+      }
+    });
   };
 
     return (

@@ -45,26 +45,22 @@ io.on('connection', (socket) => {
         // if player disconects remove them from the player list
         socket.on('disconnect', () => {
             quiz.players = quiz.players.filter((player) => player.socketId !== socket.id);
-            console.log(`${username} disconnected from quiz ${quizId}`);
             io.to(quizId).emit("UpdatePlayers", { players: quiz.players });
+            console.log(`${username} disconnected from quiz ${quizId}`);
         });
-        
     });
     
-
-    socket.on('PlayerList', (data) => {
-        quizId = data.quizId;
-        const quiz = activeQuizzes.get(quizId);
+    // Check if room exists
+    socket.on("ValidateInputs", (data, cb) => {
+        const quiz = activeQuizzes.get(data.quizId);
         if (quiz) {
-            socket.emit('PlayerList', { players: quiz.players });
-        } else {
-            socket.emit('Error', { message: 'Quiz does not exist' });
-        }
-    })
-
-    socket.on('disconnect', () => {
-        console.log('User disconnected');
+            const username = quiz.players.find(p => p.username === data.username);
+            if (username) {
+                cb({error: true, msg: "User with this name exists!" });
+            } else cb({error: false});
+        } else cb({error: true, msg: "Room doesn't exists!"});
     });
+
 });
 
 // To generate unique 6 digit quiz ID
