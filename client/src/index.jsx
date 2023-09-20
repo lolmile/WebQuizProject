@@ -10,6 +10,7 @@ import { BrowserRouter, Routes,Route } from "react-router-dom";
 import Multiplayer from './SocketIO/Multiplayer';
 import MultiplayerChoice from './SocketIO/MultiplayerChoice';
 import JoinQuiz from './JoinQuiz';
+import WaitingRoom from './WaitingRoom';
 import './TableDesign.css'
 
 
@@ -22,9 +23,9 @@ root.render(
         <Route path="/play" element={<Play />} />
         <Route path="/leaderboard" element={<Leaderboard />} />
         <Route path="/join" element={<JoinQuiz />} />
+        <Route path="/waiting-room/:quizId" element={<WaitingRoom />} />
         <Route path='multiplayer' element={<Multiplayer/>}>
           <Route path='choice' element={<MultiplayerChoice/>}/>
-
         </Route>
     </Routes>
   </BrowserRouter>

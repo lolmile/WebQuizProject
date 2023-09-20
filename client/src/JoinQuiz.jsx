@@ -20,19 +20,21 @@ function JoinQuiz() {
       }, 5000);
       return;
     }
-    
-    
+
     // Connect to the Socket.io server
     const socket = io("http://localhost:5000");
 
-    // Emit the 'JoinQuiz' event with the entered room ID and username
+    // Emit the 'JoinQuiz' event with the extracted quiz ID and username
     socket.emit("JoinQuiz", { quizId: roomId, username });
 
-    // Listen for the server's response
+    /* // Listen for the server's response
     socket.on("JoinedQuiz", ({ quizId }) => {
       // Successfully joined the quiz, redirect the user to the waiting room
       console.log(`Joined Quiz ${quizId}`);
-    });
+    }); */
+
+    // navigate to waiting room
+    navigate(`/waiting-room/${roomId}`, {state: { username } }); // Navigate to the WaitingRoom with the quiz ID and username as URL parameters
 
     // Listen for errors
     socket.on("Error", ({ message }) => {
