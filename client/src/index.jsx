@@ -9,7 +9,7 @@ import SelectCategory from './SelectCategory';
 import { BrowserRouter, Routes,Route } from "react-router-dom";
 import Multiplayer from './SocketIO/Multiplayer';
 import MultiplayerChoice from './SocketIO/MultiplayerChoice';
-import JoinQuiz from './JoinQuiz';
+import JoinQuiz from './JoinQuiz';  
 import './TableDesign.css'
 
 

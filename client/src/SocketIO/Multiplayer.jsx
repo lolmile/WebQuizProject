@@ -1,28 +1,36 @@
-import React, { useEffect, useRef } from 'react'
-import { Outlet, useNavigate } from 'react-router-dom'
-import {io} from 'socket.io-client'
-import { SocketContext } from './SocketContext'
+import React, { useEffect, useState } from 'react';
+import { io } from 'socket.io-client';
+import { Outlet, useNavigate } from 'react-router-dom';
+import { SocketContext } from './SocketContext';
 
-const SERVER_HOST = "http://localhost:5000"
-
+const SERVER_HOST = "http://localhost:5000";
 
 function Multiplayer() {
+  const [socket, setSocket] = useState(null);
+  const navigate = useNavigate();
 
-    const socket = useRef()
-    const navigate = useNavigate()
+  useEffect(() => {
+    const newSocket = io(SERVER_HOST);
 
-    useEffect(() => {
+    newSocket.on("connect", () => {
+      console.log("Connected to WS server");
+      setSocket(newSocket);
+      navigate("/selectCategory");
+    });
 
-        socket.current = io(SERVER_HOST)
-        console.log("connected to WS server");
-        navigate("choice")
-    }, [])
+    // Clean up socket connection on component unmount
+    return () => {
+      if (socket) {
+        socket.disconnect();
+      }
+    };
+  }, [navigate, socket]);
 
   return (
-    <SocketContext.Provider value={socket.current}>
-      <Outlet/>
+    <SocketContext.Provider value={socket}>
+      <Outlet />
     </SocketContext.Provider>
-  )
+  );
 }
 
-export default Multiplayer
+export default Multiplayer;

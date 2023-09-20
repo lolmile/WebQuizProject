@@ -19,6 +19,7 @@ app.get('/', (req, res) => {
     res.send('OK');
 });
 
+
 // Start the server
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
@@ -66,4 +67,37 @@ function generateUniqueQuizId() {
         quizId = Math.floor(100000 + Math.random() * 900000);
     }
     return quizId;
+}
+
+
+io.on("getQuestion", (arg) => {
+    console.log('arg: ', arg);
+    getQuestion(arg)
+})
+
+async function getQuestion(options){
+
+    try {
+        if (!options) {
+          throw new Error('Options object is undefined');
+        }    
+
+        const numOfQuestion = options.numOfQuestion
+        const category = options.category
+        const difficulty = options.difficulty
+
+        let apiLink = "https://opentdb.com/api.php?amount="
+
+        if (parseInt(numOfQuestion) > 0){
+            apiLink += numOfQuestion
+        }
+        
+        console.log('apiLink: ', apiLink);
+
+        const responce = await fetch()
+
+    } catch (error) {
+    console.error('Error in getQuestion:', error.message);
+    // Handle the error, such as logging or displaying an error message
+    }
 }

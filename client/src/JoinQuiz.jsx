@@ -44,7 +44,7 @@ function JoinQuiz() {
       <>
         <div className="top-left-emoji">
           <Link to="/" className="link-no-style">
-            <h1>????</h1>
+            <h1>🧙</h1>
           </Link>
         </div>
         <h1 className="text-center mt-3">Join Qwiz</h1>

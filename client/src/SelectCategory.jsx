@@ -1,11 +1,12 @@
-import { useEffect, useState } from "react";
-import {Link} from "react-router-dom"
+import { useContext, useEffect, useRef, useState } from "react";
+import {Link, useNavigate} from "react-router-dom"
 import spellImage from "./img/spell.png";
+import { SocketContext } from "./SocketIO/SocketContext";
 
 function SelectCategory(){
 
-  const [category, setCategory] = useState()
   const [categoryList, setCategoryList] = useState([])
+  const [category, setCategory] = useState()
   const [numQuestions, setNumQuestions] = useState()
   const [timerPerQuestion, setTimePerQuestion] = useState()
   const [difficulty, setDifficulty] = useState()
@@ -13,7 +14,17 @@ function SelectCategory(){
   const numList = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
   const difficultyList = ['Any', 'Easy', 'Medium', 'Hard']
 
+  const socket = useContext(SocketContext)
+  const navigate = useNavigate()
+
   useEffect(() => {
+    
+    if (!socket){
+      return
+    }
+
+    navigate("/Multiplayer")
+
     // Function to fetch categories
     const fetchCategories = async () => {
       try {
@@ -23,7 +34,6 @@ function SelectCategory(){
           // Extract the category names from the response
           const categories = data.trivia_categories.map(category => category.name);
           setCategoryList(categories);
-          console.log('categories: ', categories);
         } else {
           throw new Error("Failed to fetch categories");
         }
@@ -33,7 +43,7 @@ function SelectCategory(){
     };
     
     fetchCategories();
-  }, []); 
+  }, [socket]); 
 
   const handleCategorySelect = (category) => {
     setCategory(category);
@@ -51,11 +61,23 @@ function SelectCategory(){
     setDifficulty(difficulty);
   };
 
+  const createQuiz = () => {
+    console.log("test");
+    const options = {
+      numOfQuestion: numQuestions,
+      category: category,
+      difficulty: difficulty,
+      timePerQuestion: timerPerQuestion
+    }
+    console.log('socket: ', socket);
+    socket.emit("getQuestion", options)
+  }
+
     return (
         <>
       <div className="top-left-emoji">
         <Link to="/" className="link-no-style">
-          <h1>????</h1>
+          <h1>🧙</h1>
         </Link>
       </div>
         <div className="mt-2 text-center fs-1">
@@ -146,7 +168,7 @@ function SelectCategory(){
                 </div>
               </div>
             </div>
-            <button className="btn btn-success fs-3" style={{padding : "2rem 3rem", marginTop : "100px"}}>Create Game!</button>
+            <button className="btn btn-success fs-3" style={{padding : "2rem 3rem", marginTop : "100px"}} onClick={createQuiz}>Create Game!</button>
           </div>
           <img src={spellImage} alt="Electric spell"></img>
         </div>
