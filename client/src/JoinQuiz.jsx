@@ -20,9 +20,10 @@ function JoinQuiz() {
       }, 5000);
       return;
     }
-
+    
+    
     // Connect to the Socket.io server
-    const socket = io("http://localhost:3000");
+    const socket = io("http://localhost:5000");
 
     // Emit the 'JoinQuiz' event with the entered room ID and username
     socket.emit("JoinQuiz", { quizId: roomId, username });
@@ -44,7 +45,7 @@ function JoinQuiz() {
       <>
         <div className="top-left-emoji">
           <Link to="/" className="link-no-style">
-            <h1>🧙</h1>
+            <h1>Back</h1>
           </Link>
         </div>
         <h1 className="text-center mt-3">Join Qwiz</h1>
