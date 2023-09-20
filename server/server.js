@@ -4,6 +4,7 @@ const socketIo = require('socket.io');
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, { cors: { origin: 'http://localhost:3000' } });
+const axios = require('axios');
 
 // To keep track of the active quizzes
 const activeQuizzes = new Map();
@@ -61,6 +62,34 @@ io.on('connection', (socket) => {
         } else cb({error: true, msg: "Room doesn't exists!"});
     });
 
+    socket.on("getQuestion", async (options) => {
+
+        let apiLink = "https://opentdb.com/api.php?"
+
+        if (options.numOfQuestions) {
+            apiLink = apiLink + "amount=" + options.numOfQuestions
+        }else {
+            return
+        }
+
+        if (options.category && options.category != "Any"){
+            apiLink = apiLink + "&category=" + options.category 
+        }
+
+        if (options.difficulty && options.difficulty != "Any"){
+            apiLink = apiLink + "&difficulty=" + options.difficulty 
+        }
+
+        const timePerQuestion = options.timePerQuestion
+        const question = await fetchQuestions(apiLink)
+        
+        const quizData = {
+            question: question,
+            timePerQuestion: timePerQuestion
+        }
+
+        socket.emit()
+    })
 });
 
 // To generate unique 6 digit quiz ID
@@ -89,6 +118,19 @@ server.listen(PORT, () => {
     console.log(`Server listening on: http://localhost:${PORT}`);
 });
 
-
-
+async function fetchQuestions(apiLink) {
+    try {
+      const response = await axios.get(apiLink);
+  
+      if (response.status === 200) {
+        return response.data;
+      } else {
+        throw new Error("Failed to fetch categories");
+      }
+    } catch (error) {
+      console.error(error);
+      // If you want to propagate the error, you can re-throw it here:
+      throw error;
+    }
+  }
 
