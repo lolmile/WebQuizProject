@@ -77,11 +77,11 @@ io.on('connection', (socket) => {
             return
         }
 
-        if (options.category){
+        if (options.category && options.category != "Any"){
             apiLink = apiLink + "&category=" + options.category 
         }
 
-        if (options.difficulty){
+        if (options.difficulty && options.difficulty != "Any"){
             apiLink = apiLink + "&difficulty=" + options.difficulty 
         }
 

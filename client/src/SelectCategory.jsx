@@ -8,10 +8,10 @@ function SelectCategory(){
 
   const [categoryList, setCategoryList] = useState([])
   const [socket, setSocket] = useState(null);
-  const [category, setCategory] = useState()
-  const [numQuestions, setNumQuestions] = useState()
-  const [timerPerQuestion, setTimePerQuestion] = useState()
-  const [difficulty, setDifficulty] = useState()
+  const [category, setCategory] = useState("Any")
+  const [numQuestions, setNumQuestions] = useState(5)
+  const [timerPerQuestion, setTimePerQuestion] = useState(5)
+  const [difficulty, setDifficulty] = useState("Any")
 
   const numList = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
   const difficultyList = ['Any', 'Easy', 'Medium', 'Hard']
@@ -90,7 +90,7 @@ function SelectCategory(){
                 Categories
                 <div className="dropdown-center mt-4">
                   <button className="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    {category || "Select Category"}
+                    {category}
                   </button>
                   <ul className="dropdown-menu">
                   {categoryList.map((option, index) => (
@@ -110,7 +110,7 @@ function SelectCategory(){
                 Number of questions
                 <div className="dropdown-center mt-4">
                   <button className="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    {numQuestions || "Select Number of Question(s)"}
+                    {numQuestions}
                   </button>
                   <ul className="dropdown-menu">
                   {numList.map((option, index) => (
@@ -130,7 +130,7 @@ function SelectCategory(){
                 Timer per Question
                 <div className="dropdown-center mt-4">
                   <button className="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    {timerPerQuestion || "Select Time per Question"}
+                    {timerPerQuestion}
                   </button>
                   <ul className="dropdown-menu">
                   {numList.map((option, index) => (
@@ -150,7 +150,7 @@ function SelectCategory(){
                 Difficulty
                 <div className="dropdown-center mt-4">
                   <button className="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    {difficulty || "Select Difficulty"}
+                    {difficulty}
                   </button>
                   <ul className="dropdown-menu">
                   {difficultyList.map((option, index) => (
@@ -169,7 +169,7 @@ function SelectCategory(){
             </div>
             <button className="btn btn-success fs-3" style={{padding : "2rem 3rem", marginTop : "100px"}} onClick={createQuiz}>Create Game!</button>
           </div>
-          <img src={spellImage} alt="Electric spell"></img>
+          <img src={spellImage} alt="Electric spell" style= {{width:"200px", height:"100px" }}></img>
         </div>
     </>
     )
