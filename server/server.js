@@ -36,15 +36,48 @@ io.on('connection', (socket) => {
         if (quiz) {
             quiz.players.push({ socketId: socket.id, username });
             socket.join(quizId);
-            socket.emit('JoinedQuiz', { quizId });
+            // Send 
             console.log(`${username} joined quiz ${quizId}`);
         } else {
             socket.emit('Error', { message: 'Quiz does not exist' });
         }
+        /*
+        // if player disconects remove them from the player list
+        socket.on('disconnect', () => {
+            quiz.players = quiz.players.filter((player) => player.socketId !== socket.id);
+            console.log(`${username} disconnected from quiz ${quizId}`);
+        });
+        */
     });
+
+    socket.on('quizJoined', (data) => {
+        socket.emit('PlayerList', (data.quizId));
+    });
+
+
+    socket.on('PlayerList', (data) => {
+        quizId = data.quizId;
+        const quiz = activeQuizzes.get(quizId);
+        if (quiz) {
+            socket.emit('PlayerList', { players: quiz.players });
+        } else {
+            socket.emit('Error', { message: 'Quiz does not exist' });
+        }
+    })
 
     socket.on('disconnect', () => {
         console.log('User disconnected');
+
+        // Removes player from the list on disconnect
+        activeQuizzes.forEach((q) => {
+            const player = q.players.find((p => p.socketId === socket.id));
+            if (player){
+                const i = q.players.findIndex(p => p === player);
+                q.players.slice(i, 1);
+            }
+        });
+
+        socket.emit('leftQuiz'); // Lets waiting room know they players has disconnected
     });
 });
 

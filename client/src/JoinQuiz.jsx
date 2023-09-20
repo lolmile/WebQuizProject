@@ -32,8 +32,10 @@ function JoinQuiz() {
     socket.on("JoinedQuiz", ({ quizId }) => {
       // Successfully joined the quiz, redirect the user to the waiting room
       console.log(`Joined Quiz ${quizId}`);
-      navigate(`/waiting-room/${quizId}`); // Redirect to the waiting room with the quiz ID
-    });
+    }); */
+
+    // navigate to waiting room
+    navigate(`/waiting-room/${roomId}`, {state: { username } }); // Navigate to the WaitingRoom with the quiz ID and username as URL parameters
 
     // Listen for errors
     socket.on("Error", ({ message }) => {
@@ -76,6 +78,7 @@ function JoinQuiz() {
                     onChange={(e) => setUsername(e.target.value)}
                   />
                   <button
+                    type="button"
                     className="btn btn-lg btn-success mt-3 w-50"
                     onClick={handleJoinQuiz}
                   >
