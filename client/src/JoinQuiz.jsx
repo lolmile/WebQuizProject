@@ -31,7 +31,7 @@ function JoinQuiz() {
           setErrorMessage("");
         }, 5000);
       } else {
-        navigate(`/waiting-room/${roomId}`, {state: { username } }); // Navigate to the WaitingRoom with the quiz ID and username as URL parameters
+        navigate(`/waiting-room/${roomId}`, {state: { username } }); // Navigate to the WaitingRoom with the quiz ID and username as URL parameters 
       }
     });
   };
