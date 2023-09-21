@@ -85,6 +85,7 @@ io.on('connection', (socket) => {
             apiLink = apiLink + "&difficulty=" + options.difficulty 
         }
 
+
         const timePerQuestion = options.timePerQuestion
         const question = await fetchQuestions(apiLink)
         
