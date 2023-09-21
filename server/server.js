@@ -26,10 +26,10 @@ io.on('connection', (socket) => {
             questions: questions,
             timePerQuestion: data.options.timePerQuestion
         };
-        activeQuizzes.set(quizId, quiz);
+        activeQuizzes.set(quizId.toString(), quiz);
         socket.join(quizId);
-        cb(quiz.quizId)
-        console.log(`Quiz ${quizId} created`);
+        cb(quizId);
+        console.log(`Quiz ${quizId} created`); // TRY LOGGING activeQuizzes.get(quizId)
 
         socket.on("disconnect", () => {
             activeQuizzes.delete(quizId);
@@ -61,7 +61,8 @@ io.on('connection', (socket) => {
     
     // Check if room exists
     socket.on("ValidateInputs", (data, cb) => {
-        const quiz = activeQuizzes.get(data.quizId);
+        const quiz = activeQuizzes.get(data.quizId); 
+        console.log('activeQuizzes: ', activeQuizzes.keys());
         if (quiz) {
             const username = quiz.players.find(p => p.username === data.username);
             if (username) {
