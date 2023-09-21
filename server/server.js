@@ -69,28 +69,29 @@ io.on('connection', (socket) => {
             } else cb({error: false});
         } else cb({error: true, msg: "Room doesn't exists!"});
     });
-
-    const getQuestions = async (options) => {
-        let apiLink = "https://opentdb.com/api.php?"
-
-        if (options.numOfQuestions) {
-            apiLink = apiLink + "amount=" + options.numOfQuestions;
-        }else {
-            return;
-        }
-
-        if (options.category && options.category != "Any"){
-            apiLink = apiLink + "&category=" + options.category;
-        }
-
-        if (options.difficulty && options.difficulty != "Any"){
-            apiLink = apiLink + "&difficulty=" + options.difficulty.toLowerCase();
-        }
-
-        const questions = await fetchQuestions(apiLink);
-        return questions.results;
-    };
 });
+
+
+const getQuestions = async (options) => {
+    let apiLink = "https://opentdb.com/api.php?"
+
+    if (options.numOfQuestions) {
+        apiLink = apiLink + "amount=" + options.numOfQuestions;
+    }else {
+        return;
+    }
+
+    if (options.category && options.category != "Any"){
+        apiLink = apiLink + "&category=" + options.category;
+    }
+
+    if (options.difficulty && options.difficulty != "Any"){
+        apiLink = apiLink + "&difficulty=" + options.difficulty;
+    }
+
+    const questions = await fetchQuestions(apiLink);
+    return questions.results;
+};
 
 // To generate unique 6 digit quiz ID
 function generateUniqueQuizId() {

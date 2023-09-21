@@ -4,12 +4,11 @@ import spellImage from "./img/spell.png";
 import { io } from "socket.io-client";
 
 function SelectCategory() {
-  const [category, setCategory] = useState();
-  const [categoryName, setCategoryName] = useState();
+  const [category, setCategory] = useState("Any");
   const [categoryList, setCategoryList] = useState([]);
-  const [numQuestions, setNumQuestions] = useState();
-  const [timerPerQuestion, setTimePerQuestion] = useState();
-  const [difficulty, setDifficulty] = useState();
+  const [numQuestions, setNumQuestions] = useState(5);
+  const [timerPerQuestion, setTimePerQuestion] = useState(5);
+  const [difficulty, setDifficulty] = useState("Any");
 
   const numList = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50];
   const difficultyList = ["Any", "Easy", "Medium", "Hard"];
@@ -38,8 +37,7 @@ function SelectCategory() {
   }, []);
 
   const handleCategorySelect = (category) => {
-    setCategory(category.id);
-    setCategoryName(category.name);
+    setCategory(category);
   };
 
   const handleNumQuestionsSelect = (numQuestions) => {
@@ -69,7 +67,7 @@ function SelectCategory() {
     <>
       <div className="top-left-emoji">
         <Link to="/" className="link-no-style">
-          <h1>Back</h1>
+          <h1>return</h1>
         </Link>
       </div>
       <div className="mt-2 text-center fs-1">
@@ -86,14 +84,14 @@ function SelectCategory() {
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
                 >
-                  {categoryName || "Select Category"}
+                  {category}
                 </button>
                 <ul className="dropdown-menu">
                   {categoryList.map((option, index) => (
                     <li key={index}>
                       <a
                         className="dropdown-item"
-                        onClick={() => handleCategorySelect(option)}
+                        onClick={() => handleCategorySelect(option.id)}
                       >
                         {option.name}
                       </a>
@@ -111,7 +109,7 @@ function SelectCategory() {
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
                 >
-                  {numQuestions || "Select Number of Question(s)"}
+                  {numQuestions}
                 </button>
                 <ul className="dropdown-menu">
                   {numList.map((option, index) => (
@@ -136,7 +134,7 @@ function SelectCategory() {
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
                 >
-                  {timerPerQuestion || "Select Time per Question"}
+                  {timerPerQuestion}
                 </button>
                 <ul className="dropdown-menu">
                   {numList.map((option, index) => (
@@ -161,7 +159,7 @@ function SelectCategory() {
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
                 >
-                  {difficulty || "Select Difficulty"}
+                  {difficulty}
                 </button>
                 <ul className="dropdown-menu">
                   {difficultyList.map((option, index) => (
@@ -186,7 +184,7 @@ function SelectCategory() {
             Create Game!
           </button>
         </div>
-        <img src={spellImage} alt="Electric spell"></img>
+        <img src={spellImage} alt="Electric spell" style={{width:"250px"}}></img>
       </div>
     </>
   );
