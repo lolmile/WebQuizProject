@@ -5,6 +5,7 @@ import { io } from "socket.io-client";
 
 function SelectCategory() {
   const [category, setCategory] = useState();
+  const [categoryName, setCategoryName] = useState();
   const [categoryList, setCategoryList] = useState([]);
   const [numQuestions, setNumQuestions] = useState();
   const [timerPerQuestion, setTimePerQuestion] = useState();
@@ -37,7 +38,8 @@ function SelectCategory() {
   }, []);
 
   const handleCategorySelect = (category) => {
-    setCategory(category);
+    setCategory(category.id);
+    setCategoryName(category.name);
   };
 
   const handleNumQuestionsSelect = (numQuestions) => {
@@ -65,7 +67,7 @@ function SelectCategory() {
     <>
       <div className="top-left-emoji">
         <Link to="/" className="link-no-style">
-          <h1>????</h1>
+          <h1>Back</h1>
         </Link>
       </div>
       <div className="mt-2 text-center fs-1">
@@ -82,14 +84,14 @@ function SelectCategory() {
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
                 >
-                  {category || "Select Category"}
+                  {categoryName || "Select Category"}
                 </button>
                 <ul className="dropdown-menu">
                   {categoryList.map((option, index) => (
                     <li key={index}>
                       <a
                         className="dropdown-item"
-                        onClick={() => handleCategorySelect(option.id)}
+                        onClick={() => handleCategorySelect(option)}
                       >
                         {option.name}
                       </a>
