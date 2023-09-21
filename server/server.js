@@ -16,7 +16,7 @@ app.get('/', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-    socket.on('CreateQuiz', async (data) => {
+    socket.on('CreateQuiz', async (data, cb) => {
         const quizId = generateUniqueQuizId();
         const questions = await getQuestions(data.options);
         const quiz = {
@@ -30,6 +30,13 @@ io.on('connection', (socket) => {
         };
         activeQuizzes.set(quizId, quiz);
         socket.join(quizId);
+        cb(quiz.quizId)
+        console.log(`Quiz ${quizId} created`);
+
+        socket.on("disconnect", () => {
+            activeQuizzes.delete(quizId);
+            console.log(`Quiz ${quizId} deleted`);
+        }); 
     });
 
     function startQuizLoop(quizId, quiz) {

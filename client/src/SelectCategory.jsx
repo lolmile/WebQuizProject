@@ -56,8 +56,10 @@ function SelectCategory() {
     // Connect to the Socket.io server
     const socket = io("http://localhost:5000");
 
-    // TODO: create new quiz and send creator to waiting room
-    socket.emit("CreateQuiz", {options: { numOfQuestions: numQuestions, category, difficulty, timePerQuestion: timerPerQuestion}});
+    socket.emit("CreateQuiz", {options: { numOfQuestions: numQuestions, category, difficulty, timePerQuestion: timerPerQuestion}}, (data) => {
+        const roomId = data
+        navigate(`/waiting-room/${roomId}`, { state: { username: "Game Master" } }); // Navigate to the WaitingRoom with the quiz ID and username as URL parameters
+    });
     
   };
 
