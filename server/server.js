@@ -16,17 +16,18 @@ app.get('/', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-    socket.on('CreateQuiz', (data) => {
+    socket.on('CreateQuiz', async (data) => {
         const quizId = generateUniqueQuizId();
+        const questions = await getQuestions(data.options);
         const quiz = {
             quizId,
             creator: socket.id,
             players: [],
-            questions: data.questions,
+            questions: questions,
+            timePerQuestion: data.options.timePerQuestion
         };
         activeQuizzes.set(quizId, quiz);
         socket.join(quizId);
-        socket.emit('CreatedQuiz', { quizId });
     });
 
     socket.on('JoinQuiz', (data) => {
@@ -62,34 +63,26 @@ io.on('connection', (socket) => {
         } else cb({error: true, msg: "Room doesn't exists!"});
     });
 
-    socket.on("getQuestion", async (options) => {
-
+    const getQuestions = async (options) => {
         let apiLink = "https://opentdb.com/api.php?"
 
         if (options.numOfQuestions) {
-            apiLink = apiLink + "amount=" + options.numOfQuestions
+            apiLink = apiLink + "amount=" + options.numOfQuestions;
         }else {
-            return
+            return;
         }
 
         if (options.category && options.category != "Any"){
-            apiLink = apiLink + "&category=" + options.category 
+            apiLink = apiLink + "&category=" + options.category;
         }
 
         if (options.difficulty && options.difficulty != "Any"){
-            apiLink = apiLink + "&difficulty=" + options.difficulty 
+            apiLink = apiLink + "&difficulty=" + options.difficulty.toLowerCase();
         }
 
-        const timePerQuestion = options.timePerQuestion
-        const question = await fetchQuestions(apiLink)
-        
-        const quizData = {
-            question: question,
-            timePerQuestion: timePerQuestion
-        }
-
-        socket.emit()
-    })
+        const questions = await fetchQuestions(apiLink);
+        return questions.results;
+    };
 });
 
 // To generate unique 6 digit quiz ID
