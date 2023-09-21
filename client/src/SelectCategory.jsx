@@ -1,40 +1,30 @@
-import { useContext, useEffect, useState } from "react";
-import {Link, useNavigate} from "react-router-dom"
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom"; // Import useNavigate
 import spellImage from "./img/spell.png";
-import { SocketContext } from "./SocketIO/SocketContext";
-import { io } from 'socket.io-client';
+import { io } from "socket.io-client";
 
-function SelectCategory(){
+function SelectCategory() {
+  const [category, setCategory] = useState();
+  const [categoryList, setCategoryList] = useState([]);
+  const [numQuestions, setNumQuestions] = useState();
+  const [timerPerQuestion, setTimePerQuestion] = useState();
+  const [difficulty, setDifficulty] = useState();
 
-  const [categoryList, setCategoryList] = useState([])
-  const [socket, setSocket] = useState(null);
-  const [category, setCategory] = useState("Any")
-  const [numQuestions, setNumQuestions] = useState(5)
-  const [timerPerQuestion, setTimePerQuestion] = useState(5)
-  const [difficulty, setDifficulty] = useState("Any")
+  const numList = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50];
+  const difficultyList = ["Any", "Easy", "Medium", "Hard"];
 
-  const numList = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
-  const difficultyList = ['Any', 'Easy', 'Medium', 'Hard']
-  const SERVER_HOST = "http://localhost:5000";
+  const navigate = useNavigate(); // Initialize useNavigate
 
   useEffect(() => {
-
-    const newSocket = io(SERVER_HOST);
-
-    newSocket.on("connect", () => {
-      console.log("Connected to WS server");
-      setSocket(newSocket);
-    });
-    
     // Function to fetch categories
     const fetchCategories = async () => {
       try {
         const response = await fetch("https://opentdb.com/api_category.php");
         if (response.ok) {
           const data = await response.json();
-          // Extract the category names from the response
-          const categories = data.trivia_categories.map(category => category.name);
+          const categories = data.trivia_categories;
           setCategoryList(categories);
+          console.log("categories: ", categories);
         } else {
           throw new Error("Failed to fetch categories");
         }
@@ -42,9 +32,9 @@ function SelectCategory(){
         console.error(error);
       }
     };
-    
+
     fetchCategories();
-  }, []); 
+  }, []);
 
   const handleCategorySelect = (category) => {
     setCategory(category);
@@ -62,57 +52,64 @@ function SelectCategory(){
     setDifficulty(difficulty);
   };
 
-  const createQuiz = () => {
-    const options = {
-      numOfQuestions: numQuestions,
-      category: category,
-      difficulty: difficulty,
-      timePerQuestion: timerPerQuestion
-    }
-    socket.emit("getQuestion", options)
-  }
+  const handleCreateGame = () => {
+    // Connect to the Socket.io server
+    const socket = io("http://localhost:5000");
 
-    return (
-        <>
+    // TODO: create new quiz and send creator to waiting room
+    socket.emit("CreateQuiz", {options: { numOfQuestions: numQuestions, category, difficulty, timePerQuestion: timerPerQuestion}});
+    
+  };
+
+  return (
+    <>
       <div className="top-left-emoji">
         <Link to="/" className="link-no-style">
-          <h1>Back</h1>
+          <h1>????</h1>
         </Link>
       </div>
-        <div className="mt-2 text-center fs-1">
-          Create a Room
-          <div className="fs-2">
-            Settings
-          </div>
-          <div className="container mt-5">
-            <div className="row fs-3 mb-5">
-              <div className="col">
-                Categories
-                <div className="dropdown-center mt-4">
-                  <button className="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    {category}
-                  </button>
-                  <ul className="dropdown-menu">
+      <div className="mt-2 text-center fs-1">
+        Create a Room
+        <div className="fs-2">Settings</div>
+        <div className="container mt-5">
+          <div className="row fs-3 mb-5">
+            <div className="col">
+              Categories
+              <div className="dropdown-center mt-4">
+                <button
+                  className="btn btn-secondary dropdown-toggle"
+                  type="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  {category || "Select Category"}
+                </button>
+                <ul className="dropdown-menu">
                   {categoryList.map((option, index) => (
                     <li key={index}>
                       <a
                         className="dropdown-item"
-                        onClick={() => handleCategorySelect(option)}
+                        onClick={() => handleCategorySelect(option.id)}
                       >
-                        {option}
+                        {option.name}
                       </a>
                     </li>
                   ))}
-                  </ul>
-                </div>
+                </ul>
               </div>
-              <div className="col">
-                Number of questions
-                <div className="dropdown-center mt-4">
-                  <button className="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    {numQuestions}
-                  </button>
-                  <ul className="dropdown-menu">
+            </div>
+            <div className="col">
+              Number of questions
+              <div className="dropdown-center mt-4">
+                <button
+                  className="btn btn-secondary dropdown-toggle"
+                  type="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  {numQuestions || "Select Number of Question(s)"}
+                </button>
+                <ul className="dropdown-menu">
                   {numList.map((option, index) => (
                     <li key={index}>
                       <a
@@ -123,16 +120,21 @@ function SelectCategory(){
                       </a>
                     </li>
                   ))}
-                  </ul>
-                </div>
+                </ul>
               </div>
-              <div className="col">
-                Timer per Question
-                <div className="dropdown-center mt-4">
-                  <button className="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    {timerPerQuestion}
-                  </button>
-                  <ul className="dropdown-menu">
+            </div>
+            <div className="col">
+              Timer per Question
+              <div className="dropdown-center mt-4">
+                <button
+                  className="btn btn-secondary dropdown-toggle"
+                  type="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  {timerPerQuestion || "Select Time per Question"}
+                </button>
+                <ul className="dropdown-menu">
                   {numList.map((option, index) => (
                     <li key={index}>
                       <a
@@ -143,16 +145,21 @@ function SelectCategory(){
                       </a>
                     </li>
                   ))}
-                  </ul>
-                </div>
+                </ul>
               </div>
-              <div className="col">
-                Difficulty
-                <div className="dropdown-center mt-4">
-                  <button className="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    {difficulty}
-                  </button>
-                  <ul className="dropdown-menu">
+            </div>
+            <div className="col">
+              Difficulty
+              <div className="dropdown-center mt-4">
+                <button
+                  className="btn btn-secondary dropdown-toggle"
+                  type="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  {difficulty || "Select Difficulty"}
+                </button>
+                <ul className="dropdown-menu">
                   {difficultyList.map((option, index) => (
                     <li key={index}>
                       <a
@@ -163,15 +170,22 @@ function SelectCategory(){
                       </a>
                     </li>
                   ))}
-                  </ul>
-                </div>
+                </ul>
               </div>
             </div>
-            <button className="btn btn-success fs-3" style={{padding : "2rem 3rem", marginTop : "100px"}} onClick={createQuiz}>Create Game!</button>
           </div>
-          <img src={spellImage} alt="Electric spell" style= {{width:"200px", height:"100px" }}></img>
+          <button
+            className="btn btn-success fs-3"
+            style={{ padding: "2rem 3rem", marginTop: "100px" }}
+            onClick={handleCreateGame}
+          >
+            Create Game!
+          </button>
         </div>
+        <img src={spellImage} alt="Electric spell"></img>
+      </div>
     </>
-    )
+  );
 }
+
 export default SelectCategory;

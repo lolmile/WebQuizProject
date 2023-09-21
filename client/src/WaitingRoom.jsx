@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import io from "socket.io-client";
-import { useLocation, useParams } from "react-router-dom"; // Import useParams
+import { useLocation, useParams, useNavigate, Link } from "react-router-dom"; // Import useParams
 
 function WaitingRoom() {
   const { quizId } = useParams(); // Extract quizId from URL parameter
@@ -10,7 +10,6 @@ function WaitingRoom() {
   useEffect(() => {
     const socket = io("http://localhost:5000");
 
-    console.log("username", username)
     // join quiz
     socket.emit("JoinQuiz", { quizId, username });
 
