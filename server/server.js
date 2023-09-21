@@ -24,7 +24,9 @@ io.on('connection', (socket) => {
             creator: socket.id,
             players: [],
             questions: questions,
-            timePerQuestion: data.options.timePerQuestion
+            timePerQuestion: data.options.timePerQuestion,
+            quizInterval: null, // Initialize the quiz interval
+            currentQuestionIndex: 0,
         };
         activeQuizzes.set(quizId.toString(), quiz);
         socket.join(quizId);
@@ -35,6 +37,34 @@ io.on('connection', (socket) => {
             activeQuizzes.delete(quizId);
             console.log(`Quiz ${quizId} deleted`);
         }); 
+    });
+
+    function startQuizLoop(quizId, quiz) {
+        return setInterval(() => {
+            const questions = quiz.questions;
+            const currentQuestionIndex = quiz.currentQuestionIndex;
+            
+            if (currentQuestionIndex < questions.length) {
+                const currentQuestion = questions[currentQuestionIndex];
+                const timeToAnswer = quiz.timePerQuestion; // Adjust this as needed
+                // Notify clients about the current question and timer for this quiz room
+                io.to(quizId).emit('NextQuestion', { question: currentQuestion, timeToAnswer });
+                quiz.currentQuestionIndex++;
+            } else {
+                // Quiz is finished, stop the loop for this quiz room
+                clearInterval(quizRoom.quizInterval);
+                quiz.quizInterval = null;
+            }
+        }, 10000); // Adjust the interval duration
+    }
+
+    socket.on('StartQuizRoom', (quizId) => {
+        // Find the quiz room by quizId
+        const quizRoom = activeQuizzes.get(quizId);
+        
+        if (quizRoom && !quizRoom.quizInterval) {
+            quizRoom.quizInterval = startQuizLoop(quizId, quizRoom);
+        }
     });
 
     socket.on('JoinQuiz', (data) => {

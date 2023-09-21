@@ -67,7 +67,7 @@ function SelectCategory() {
     <>
       <div className="top-left-emoji">
         <Link to="/" className="link-no-style">
-          <h1>return</h1>
+          <h1>Back</h1>
         </Link>
       </div>
       <div className="mt-2 text-center fs-1">
