@@ -40,22 +40,26 @@ io.on('connection', (socket) => {
     });
 
     function startQuizLoop(quizId, quiz) {
+
+        const questions = quiz.questions;
+        const totalQuestions = questions.length
+        let currentQuestionIndex = quiz.currentQuestionIndex;
+
+        const interval = quiz.timePerQuestion * 1000
+
         return setInterval(() => {
-            const questions = quiz.questions;
-            const currentQuestionIndex = quiz.currentQuestionIndex;
-            
-            if (currentQuestionIndex < questions.length) {
+            if (currentQuestionIndex < totalQuestions) {
                 const currentQuestion = questions[currentQuestionIndex];
                 const timeToAnswer = quiz.timePerQuestion; // Adjust this as needed
                 // Notify clients about the current question and timer for this quiz room
-                io.to(quizId).emit('NextQuestion', { question: currentQuestion, timeToAnswer });
-                quiz.currentQuestionIndex++;
+                io.to(quizId).emit('NextQuestion', { question: currentQuestion, timeToAnswer, currentQuestionIndex, totalQuestions });
+                currentQuestionIndex++;
             } else {
                 // Quiz is finished, stop the loop for this quiz room
                 clearInterval(quiz.quizInterval);
                 quiz.quizInterval = null;
             }
-        }, 10000); // Adjust the interval duration
+        }, interval); // Adjust the interval duration
     }
 
     socket.on('StartGame', (data) => {
@@ -65,7 +69,7 @@ io.on('connection', (socket) => {
         const quizRoom = activeQuizzes.get(data.quizId);
 
         if (quizRoom && !quizRoom.quizInterval) {
-            quizRoom.quizInterval = startQuizLoop(data.quizId, activeQuizzes.get(data.quizId));
+            startQuizLoop(data.quizId, quizRoom);
         }
     });
 

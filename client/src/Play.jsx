@@ -1,63 +1,52 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import Question from './Question';
 import Spinner from './Spinner';
 import Result from './Result';
-import { openTDhost } from './constants';
+import { SocketContext } from "./SocketIO/SocketContext.js";
 
 function Play() {
 
     const [activeQuestionIndex, setActiveQuestionIndex] = useState(0);
-    const [questions, setQuestions] = useState([]);
+    const [totalQuestions, setTotalQuestions] = useState()
+    const [question, setQuestion] = useState({});
     const [quizFinished, setQuizFinished] = useState(false);
-    const [score, setScore] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
-    const [selectedCategory, setSelectedCategory] = useState({ name: localStorage.getItem('categoryName'), id: localStorage.getItem('categoryid') });
 
-    const numberOfQuestions = 10;
+    const socket = useContext(SocketContext);
+
 
     useEffect(() => {
 
-        if (!selectedCategory) {
-            return
+           // Check if the socket is connected
+        if (socket.connected) {
+            setSocketConnected(true);
+            console.log("Socket is connected.");
+        } else {
+            setSocketConnected(false);
+            console.log("Socket is not connected.");
         }
 
-        const url = `${openTDhost}?amount=${numberOfQuestions}&category=${selectedCategory.id}&difficulty=easy`
+        socket.on("NextQuestion", (quizData) => {
+            console.log("received question");
+            setQuestion(quizData.question)
+            setActiveQuestionIndex(quizData.currentQuestionIndex)
+            setTotalQuestions(quizData.totalQuestions)
+        })
 
-        setIsLoading(true);
-
-        async function fetchTrivia() {
-
-            const triviaResponse = await fetch(url);
-
-            const body = await triviaResponse.json();
-
-            if (body.results) {
-                setQuestions(body.results);
-            }
-
-            setTimeout(() => {
-                setIsLoading(false);
-            }, 500)
-        }
-
-        fetchTrivia();
-
-    }, [selectedCategory])
+    }, [socket])
 
     function selectAnswerHandler(answer) {
         setIsLoading(true);
 
         if (answer.correct) {
-            setScore((value) => value + 1); // increment score
+            //EMIT SCORE ++            
         }
 
-        if (activeQuestionIndex === numberOfQuestions - 1) {
+        //if (activeQuestionIndex === numberOfQuestions - 1) {
             // last question
-            setQuizFinished(true);
-        } else {
-            // next question
-            setActiveQuestionIndex((value) => value + 1);
-        }
+            //SET QUIZ FINISH
+            //EMIT QUIZ FINISHED
+        //}
 
         setTimeout(() => {
             setIsLoading(false);
@@ -69,25 +58,22 @@ function Play() {
             <div className="row">
                 {
                     isLoading ? <Spinner light={true} size={4}></Spinner>
-                        : (questions.length === 0 ? <></> :
+                        : (totalQuestions === 0 ? <></> :
                             <>
                                 {!quizFinished ?
                                     <div className="container">
                                         <div className="row">
-                                            <div className="col-12 text-center h1 mb-5">{selectedCategory.name}</div>
+                                            <div className="col-12 text-center h1 mb-5">Qwiz</div>
                                         </div>
                                         <div className="row">
-                                            <div className="col-12 text-center h2">Question {activeQuestionIndex + 1}/{numberOfQuestions}</div>
+                                            <div className="col-12 text-center h2">Question {activeQuestionIndex + 1}/{totalQuestions}</div>
                                         </div>
                                         <div className="row">
-                                            <Question question={questions[activeQuestionIndex].question} correct_answer={questions[activeQuestionIndex].correct_answer} incorrect_answers={questions[activeQuestionIndex].incorrect_answers} selectAnswerHandler={selectAnswerHandler}
+                                            <Question question={question.question} correct_answer={question.correct_answer} incorrect_answers={question.incorrect_answers} selectAnswerHandler={selectAnswerHandler}
                                             ></Question>
                                         </div>
                                     </div> : <>
-                                        {/* Score/result component */}
-                                        <div className="container text-center">
-                                            <Result score={score} category={selectedCategory} />
-                                        </div>
+                                        {/*GO TO LEADERBOARD*/}
                                     </>
                                 }
                             </>)}
