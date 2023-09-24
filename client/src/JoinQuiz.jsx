@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate, Link } from 'react-router-dom';
 import io, { Socket } from "socket.io-client";
+import { SocketContext } from "./SocketIO/SocketContext";
 
 function JoinQuiz() {
   const [roomId, setRoomId] = useState("");
@@ -9,6 +10,7 @@ function JoinQuiz() {
   
   // Initialize useHistory
   const navigate = useNavigate();
+  const socket = useContext(SocketContext);
   
   const handleJoinQuiz = () => {
     // Check for empty inputs
@@ -20,8 +22,6 @@ function JoinQuiz() {
       }, 5000);
       return;
     }
-
-    const socket = io("http://localhost:5000");
 
     socket.emit("ValidateInputs", { quizId: roomId, username }, (data) => {
       if (data.error) {

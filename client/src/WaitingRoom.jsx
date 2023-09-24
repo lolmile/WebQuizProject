@@ -1,41 +1,56 @@
-import React, { useEffect, useState } from "react";
-import io from "socket.io-client";
-import { useLocation, useParams, useNavigate, Link } from "react-router-dom"; // Import useParams
+import React, { useEffect, useState, useContext } from "react";
+import { useLocation, useParams, useNavigate } from "react-router-dom"; // Import useParams
+import { SocketContext } from "./SocketIO/SocketContext.js";
+
 
 function WaitingRoom() {
   const { quizId } = useParams(); // Extract quizId from URL parameter
   const { username } = useLocation().state; // Extract username from location state
   const [players, setPlayers] = useState([]);
+  const socket = useContext(SocketContext);
+
+  // Use the navigate function from React Router to programmatically navigate
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const socket = io("http://localhost:5000");
-
     // join quiz
-    socket.emit("JoinQuiz", { quizId, username });
+    try {
+      socket.emit("JoinQuiz", { quizId, username });
+    }
+    catch {
+      navigate('/');
+      return;
+    }
 
     socket.on("UpdatePlayers", (data) => {
       setPlayers(data.players);
     });
 
-   
-    // Clean up the socket connection when unmounting
-    return () => {
-      socket.disconnect();
-    };
-  }, [quizId, username]);
+    socket.on("GameStarted", () => {
+      // Redirect all players to the /play/:quizId route when the game starts
+      navigate(`/play/${quizId}`);
+    });
+  }, [quizId, username, navigate, socket]);
+
+  const handleStartGame = () => {
+    socket.emit("StartGame", { quizId });
+  };
 
   return (
-    <div>
+    <div className="text-center">
       <h1>Waiting Room</h1>
       <p>Room ID: {quizId}</p>
       <h2>Players:</h2>
-      <ul>
         {players.map((player) => (
-          <li key={player.socketId}>{player.username}</li>
+          <p className="mb-0" key={player.socketId}>{player.username}</p>
         ))}
-      </ul>
       <p>Waiting for the quiz to start...</p>
-      {/* Add additional waiting room UI here */}
+      {/* Conditionally render the "Start Game" button */}
+      {username === "Master" && (
+        <button className="btn btn-success" onClick={() => handleStartGame()}>
+          Start Game
+        </button>
+      )}
     </div>
   );
 }

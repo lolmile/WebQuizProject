@@ -14,18 +14,18 @@ import WaitingRoom from './WaitingRoom';
 import './TableDesign.css'
 
 
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <BrowserRouter>
     <Routes>
         <Route path='/' element={<Home />} />
-        <Route path="/selectCategory" element={<SelectCategory />} />
-        <Route path="/play" element={<Play />} />
         <Route path="/leaderboard" element={<Leaderboard />} />
-        <Route path="/join" element={<JoinQuiz />} />
-        <Route path="/waiting-room/:quizId" element={<WaitingRoom />} />
-        <Route path='multiplayer' element={<Multiplayer/>}>
-          <Route path='choice' element={<MultiplayerChoice/>}/>
+        <Route path='/' element={<Multiplayer />}>
+          <Route path="selectCategory" element={<SelectCategory />} />
+          <Route path="join" element={<JoinQuiz />} />
+          <Route path="waiting-room/:quizId" element={<WaitingRoom />} />
+          <Route path="play/:quizId" element={<Play />} />
         </Route>
     </Routes>
   </BrowserRouter>

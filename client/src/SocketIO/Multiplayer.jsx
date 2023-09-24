@@ -12,18 +12,13 @@ function Multiplayer() {
   useEffect(() => {
     const newSocket = io(SERVER_HOST);
 
-    newSocket.on("connect", () => {
-      console.log("Connected to WS server");
-      setSocket(newSocket);
-    });
+    setSocket(newSocket);
 
     // Clean up socket connection on component unmount
     return () => {
-      if (socket) {
-        socket.disconnect();
-      }
+      newSocket.disconnect();
     };
-  }, [navigate, socket]);
+  }, []);
 
   return (
     <SocketContext.Provider value={socket}>

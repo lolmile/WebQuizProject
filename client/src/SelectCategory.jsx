@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom"; // Import useNavigate
 import spellImage from "./img/spell.png";
 import { io } from "socket.io-client";
+import { SocketContext } from "./SocketIO/SocketContext.js";
 
 function SelectCategory() {
   const [category, setCategory] = useState("Any");
+  const [categoryName, setCategoryName] = useState("Any");
   const [categoryList, setCategoryList] = useState([]);
   const [numQuestions, setNumQuestions] = useState(5);
   const [timerPerQuestion, setTimePerQuestion] = useState(5);
@@ -14,6 +16,7 @@ function SelectCategory() {
   const difficultyList = ["Any", "Easy", "Medium", "Hard"];
 
   const navigate = useNavigate(); // Initialize useNavigate
+  const socket = useContext(SocketContext);
 
   useEffect(() => {
     // Function to fetch categories
@@ -24,7 +27,6 @@ function SelectCategory() {
           const data = await response.json();
           const categories = data.trivia_categories;
           setCategoryList(categories);
-          console.log("categories: ", categories);
         } else {
           throw new Error("Failed to fetch categories");
         }
@@ -37,7 +39,8 @@ function SelectCategory() {
   }, []);
 
   const handleCategorySelect = (category) => {
-    setCategory(category);
+    setCategory(category.id);
+    setCategoryName(category.name);
   };
 
   const handleNumQuestionsSelect = (numQuestions) => {
@@ -53,12 +56,9 @@ function SelectCategory() {
   };
 
   const handleCreateGame = () => {
-    // Connect to the Socket.io server
-    const socket = io("http://localhost:5000");
-
     socket.emit("CreateQuiz", {options: { numOfQuestions: numQuestions, category, difficulty, timePerQuestion: timerPerQuestion}}, (data) => {
         const roomId = data
-        navigate(`/waiting-room/${roomId}`, { state: { username: "Game Master" } }); // Navigate to the WaitingRoom with the quiz ID and username as URL parameters
+        navigate(`/waiting-room/${roomId}`, { state: { username: "Master" } }); // Navigate to the WaitingRoom with the quiz ID and username as URL parameters
     });
     
   };
@@ -84,14 +84,14 @@ function SelectCategory() {
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
                 >
-                  {category}
+                  {categoryName}
                 </button>
                 <ul className="dropdown-menu">
                   {categoryList.map((option, index) => (
                     <li key={index}>
                       <a
                         className="dropdown-item"
-                        onClick={() => handleCategorySelect(option.id)}
+                        onClick={() => handleCategorySelect(option)}
                       >
                         {option.name}
                       </a>

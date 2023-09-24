@@ -52,18 +52,20 @@ io.on('connection', (socket) => {
                 quiz.currentQuestionIndex++;
             } else {
                 // Quiz is finished, stop the loop for this quiz room
-                clearInterval(quizRoom.quizInterval);
+                clearInterval(quiz.quizInterval);
                 quiz.quizInterval = null;
             }
         }, 10000); // Adjust the interval duration
     }
 
-    socket.on('StartQuizRoom', (quizId) => {
+    socket.on('StartGame', (data) => {
+        io.to(data.quizId).emit("GameStarted");
+
         // Find the quiz room by quizId
-        const quizRoom = activeQuizzes.get(quizId);
-        
+        const quizRoom = activeQuizzes.get(data.quizId);
+
         if (quizRoom && !quizRoom.quizInterval) {
-            quizRoom.quizInterval = startQuizLoop(quizId, quizRoom);
+            quizRoom.quizInterval = startQuizLoop(data.quizId, activeQuizzes.get(data.quizId));
         }
     });
 
@@ -87,6 +89,12 @@ io.on('connection', (socket) => {
             io.to(quizId).emit("UpdatePlayers", { players: quiz.players });
             console.log(`${username} disconnected from quiz ${quizId}`);
         });
+
+        socket.on('removePlayer' , (data) => {
+            quiz.players = quiz.players.filter((player) => player.socketId !== data.socketId);
+            io.to(quizId).emit("UpdatePlayers", { players: quiz.players });
+            console.log(`${username} disconnected from quiz ${quizId}`);
+        });
     });
     
     // Check if room exists
@@ -100,6 +108,15 @@ io.on('connection', (socket) => {
             } else cb({error: false});
         } else cb({error: true, msg: "Room doesn't exists!"});
     });
+
+    /* socket.on("disconnect", (data) => {
+        const quiz = activeQuizzes.get(data.quizId);
+        if (quiz) {
+            quiz.players = quiz.players.filter((player) => player.socketId !== socket.id);
+            io.to(data.quizId).emit("UpdatePlayers", { players: quiz.players });
+            console.log(`${data.username} disconnected from quiz ${data.quizId}`);
+        }
+    }); */
 });
 
 
@@ -124,12 +141,12 @@ const getQuestions = async (options) => {
     return questions.results;
 };
 
-// To generate unique 6 digit quiz ID
+// To generate unique 4 digit quiz ID
 function generateUniqueQuizId() {
-    //generate unique 6 digit quiz ID
-    let quizId = Math.floor(100000 + Math.random() * 900000);
+    // generate a random 4 digit number
+    let quizId = Math.floor(1000 + Math.random() * 9000);
     while (activeQuizzes.has(quizId)) {
-        quizId = Math.floor(100000 + Math.random() * 900000);
+        quizId = Math.floor(1000 + Math.random() * 9000);
     }
     return quizId;
 }
