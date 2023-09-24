@@ -20,12 +20,12 @@ root.render(
   <BrowserRouter>
     <Routes>
         <Route path='/' element={<Home />} />
-        <Route path="/leaderboard" element={<Leaderboard />} />
         <Route path='/' element={<Multiplayer />}>
           <Route path="selectCategory" element={<SelectCategory />} />
           <Route path="join" element={<JoinQuiz />} />
           <Route path="waiting-room/:quizId" element={<WaitingRoom />} />
           <Route path="play/:quizId" element={<Play />} />
+          <Route path="/leaderboard" element={<Leaderboard />} />
         </Route>
     </Routes>
   </BrowserRouter>

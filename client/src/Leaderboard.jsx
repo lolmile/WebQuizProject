@@ -1,37 +1,33 @@
-import { useEffect } from "react"
+import { useEffect, useContext } from "react"
 import { useState } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import {token, top10route} from './constants.js'
+import { SocketContext } from "./SocketIO/SocketContext.js";
 import Row from "./Row.jsx"
 
 function Leaderboard() {
 
-    const [scores, setScores] = useState([])
+    const [players, setPlayers] = useState([])
+    const socket = useContext(SocketContext);
+    const navigate = useNavigate
 
     useEffect(() => {
-        //Called upon component mount
-        fetchScores()
-    }, [])
 
-    async function fetchScores(){
-
-        const options = {
-            method: "GET",
-            headers: {
-                "Authorization": token
-            }
+        if (!socket){
+            navigate("/")
         }
 
-        const response = await fetch(top10route, options)
-        const data = await response.json();
+        socket.on("ReceiveScores", (data) => {
+            console.log('data: ', data);    
+            setPlayers(data.players)
+        })
+    }, [])
 
-        setScores(data)
-    }
 
     return (
     <div>
         <div>
-            <Link to="/selectCategory">
+            <Link to="/">
             <button className="btn btn-secondary px-5 py-4 fs-3" style={{float: "right", marginRight: "120px"}}>Replay</button>
             </Link>
         </div>
@@ -46,14 +42,13 @@ function Leaderboard() {
                         <thead>
                         <tr>
                             <th>Name</th>
-                            <th>Category</th>
                             <th>Score</th>
                         </tr>
                         </thead>
                         <tbody>
                         {
-                            scores.map((data, index) => {
-                                return <Row key = {index} name = {data.name} category = {data.categoryName} score = {data.score}/>
+                            players.map((player, index) => {
+                                return <Row key = {index} name = {player.username} score = {player.score}/>
                             })
                         }
                         </tbody>

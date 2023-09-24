@@ -39,6 +39,22 @@ io.on('connection', (socket) => {
         }); 
     });
 
+    socket.on("QuestionAnswer", (data) => {
+        const quizId = data.quizId
+        const quizRoom = activeQuizzes.get(quizId);
+
+        const player = quizRoom.players.find((player) => player.socketId === socket.id);
+        player.score ++
+    })
+
+    function sendScores(quizId){
+        const quizRoom = activeQuizzes.get(quizId);
+        const players = quizRoom.players
+
+        io.to(quizId).emit("ReceiveScores", {players})
+    }
+    
+
     function startQuizLoop(quizId, quiz) {
 
         const questions = quiz.questions;
@@ -50,14 +66,17 @@ io.on('connection', (socket) => {
         return setInterval(() => {
             if (currentQuestionIndex < totalQuestions) {
                 const currentQuestion = questions[currentQuestionIndex];
-                const timeToAnswer = quiz.timePerQuestion; // Adjust this as needed
+                const questionCategory = currentQuestion.category
                 // Notify clients about the current question and timer for this quiz room
-                io.to(quizId).emit('NextQuestion', { question: currentQuestion, timeToAnswer, currentQuestionIndex, totalQuestions });
+                io.to(quizId).emit('NextQuestion', { question: currentQuestion, interval, currentQuestionIndex, totalQuestions, quizId, questionCategory  });
                 currentQuestionIndex++;
             } else {
                 // Quiz is finished, stop the loop for this quiz room
                 clearInterval(quiz.quizInterval);
                 quiz.quizInterval = null;
+                io.to(quizId).emit("QuizDone")
+                sendScores(quizId)
+                return
             }
         }, interval); // Adjust the interval duration
     }
@@ -77,12 +96,16 @@ io.on('connection', (socket) => {
         const quizId = data.quizId;
         const username = data.username;
         const quiz = activeQuizzes.get(quizId);
+        const score = 0
 
         if (quiz) {
-            quiz.players.push({ socketId: socket.id, username });
-            socket.join(quizId);
-            io.to(quizId).emit("UpdatePlayers", { players: quiz.players });
-            console.log(`${username} joined quiz ${quizId}`);
+            if (username){
+                quiz.players.push({ socketId: socket.id, username, score });
+                socket.join(quizId);
+                io.to(quizId).emit("UpdatePlayers", { players: quiz.players });
+                console.log(`${username} joined quiz ${quizId}`);
+            }
+                
         } else {
             socket.emit('Error', { message: 'Quiz does not exist' });
         }

@@ -11,6 +11,7 @@ function JoinQuiz() {
   // Initialize useHistory
   const navigate = useNavigate();
   const socket = useContext(SocketContext);
+
   
   const handleJoinQuiz = () => {
     // Check for empty inputs
@@ -23,7 +24,7 @@ function JoinQuiz() {
       return;
     }
 
-    socket.emit("ValidateInputs", { quizId: roomId, username }, (data) => {
+    socket.emit("ValidateInputs", { quizId: roomId, username}, (data) => {
       if (data.error) {
         setErrorMessage(data.msg);
         //wait 3 seconds and then remove the error message
