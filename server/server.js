@@ -161,8 +161,10 @@ const getQuestions = async (options) => {
     }
 
     if (options.difficulty && options.difficulty != "Any"){
-        apiLink = apiLink + "&difficulty=" + options.difficulty;
+        apiLink = apiLink + "&difficulty=" + options.difficulty.toLowerCase();
     }
+
+    console.log('apiLink: ', apiLink);
 
     const questions = await fetchQuestions(apiLink);
     return questions.results;

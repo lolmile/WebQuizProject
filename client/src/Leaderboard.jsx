@@ -18,7 +18,6 @@ function Leaderboard() {
         }
 
         socket.on("ReceiveScores", (data) => {
-            console.log('data: ', data);    
             setPlayers(data.players)
         })
     }, [])
