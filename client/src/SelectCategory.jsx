@@ -56,7 +56,7 @@ function SelectCategory() {
   };
 
   const handleCreateGame = () => {
-    socket.emit("CreateQuiz", {options: { numOfQuestions: numQuestions, category, difficulty, timePerQuestion: timerPerQuestion}, socket}, (data) => {
+    socket.emit("CreateQuiz", {options: { numOfQuestions: numQuestions, category, difficulty, timePerQuestion: timerPerQuestion}}, (data) => {
         const roomId = data
         navigate(`/waiting-room/${roomId}`, { state: { username: "Master" } }); // Navigate to the WaitingRoom with the quiz ID and username as URL parameters
     });
