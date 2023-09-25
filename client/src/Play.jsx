@@ -24,7 +24,6 @@ function Play() {
         }
 
         socket.on('NextQuestion', (quizData) => {
-            console.log('quizData: ', quizData);
             setQuestion(quizData.question);
             setActiveQuestionIndex(quizData.currentQuestionIndex);
             setTotalQuestions(quizData.totalQuestions);

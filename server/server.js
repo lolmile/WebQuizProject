@@ -47,11 +47,11 @@ io.on('connection', (socket) => {
         player.score ++
     })
 
-    function sendScores(quizId){
+    function sendScores(quizId) {
         const quizRoom = activeQuizzes.get(quizId);
-        const players = quizRoom.players
-
-        io.to(quizId).emit("ReceiveScores", {players})
+        const players = quizRoom.players.filter((player) => !player.isCreator); // Exclude the creator
+    
+        io.to(quizId).emit("ReceiveScores", { players });
     }
     
 
@@ -98,21 +98,22 @@ io.on('connection', (socket) => {
         const quizId = data.quizId;
         const username = data.username;
         const quiz = activeQuizzes.get(quizId);
-        const score = 0
+        const score = 0;
+        const isCreator = socket.id === quiz.creator; // Check if the player is the creator
 
         if (quiz) {
-            if (username || socket){
-                quiz.players.push({ socketId: socket.id, username, score });
+            if (username || socket) {
+                quiz.players.push({ socketId: socket.id, username, score, isCreator }); // Add isCreator property
                 socket.join(quizId);
-                io.to(quizId).emit("UpdatePlayers", { players: quiz.players, creator: quiz.creator});
+                io.to(quizId).emit("UpdatePlayers", { players: quiz.players, creator: quiz.creator });
                 console.log(`${username} joined quiz ${quizId}`);
             }
-                
+
         } else {
             socket.emit('Error', { message: 'Quiz does not exist' });
         }
         
-        // if pl    ayer disconects remove them from the player list
+        // if player disconects remove them from the player list
         socket.on('disconnect', () => {
             quiz.players = quiz.players.filter((player) => player.socketId !== socket.id);
             io.to(quizId).emit("UpdatePlayers", { players: quiz.players });
