@@ -7,6 +7,7 @@ function WaitingRoom() {
   const { quizId } = useParams(); // Extract quizId from URL parameter
   const { username } = useLocation().state; // Extract username from location state
   const [players, setPlayers] = useState([]);
+  const [creatorId, setCreatorId] = useState()
   const socket = useContext(SocketContext);
 
   // Use the navigate function from React Router to programmatically navigate
@@ -24,7 +25,10 @@ function WaitingRoom() {
 
     socket.on("UpdatePlayers", (data) => {
       setPlayers(data.players);
+      setCreatorId(data.creator)
     });
+
+    console.log(creatorId);
 
     socket.on("GameStarted", () => {
       // Redirect all players to the /play/:quizId route when the game starts
@@ -46,7 +50,7 @@ function WaitingRoom() {
         ))}
       <p>Waiting for the quiz to start...</p>
       {/* Conditionally render the "Start Game" button */}
-      {username === "Master" && (
+      {creatorId === socket.id && (
         <button className="btn btn-success" onClick={() => handleStartGame()}>
           Start Game
         </button>

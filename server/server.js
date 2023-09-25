@@ -59,6 +59,7 @@ io.on('connection', (socket) => {
 
         const questions = quiz.questions;
         const totalQuestions = questions.length
+        const creator = quiz.creator
         let currentQuestionIndex = quiz.currentQuestionIndex;
 
         const interval = quiz.timePerQuestion * 1000
@@ -68,7 +69,7 @@ io.on('connection', (socket) => {
                 const currentQuestion = questions[currentQuestionIndex];
                 const questionCategory = currentQuestion.category
                 // Notify clients about the current question and timer for this quiz room
-                io.to(quizId).emit('NextQuestion', { question: currentQuestion, interval, currentQuestionIndex, totalQuestions, quizId, questionCategory  });
+                io.to(quizId).emit('NextQuestion', { question: currentQuestion, interval, currentQuestionIndex, totalQuestions, quizId, questionCategory, creator  });
                 currentQuestionIndex++;
             } else {
                 // Quiz is finished, stop the loop for this quiz room
@@ -78,6 +79,7 @@ io.on('connection', (socket) => {
                 sendScores(quizId)
                 return
             }
+            return
         }, interval); // Adjust the interval duration
     }
 
@@ -99,10 +101,10 @@ io.on('connection', (socket) => {
         const score = 0
 
         if (quiz) {
-            if (username){
+            if (username || socket){
                 quiz.players.push({ socketId: socket.id, username, score });
                 socket.join(quizId);
-                io.to(quizId).emit("UpdatePlayers", { players: quiz.players });
+                io.to(quizId).emit("UpdatePlayers", { players: quiz.players, creator: quiz.creator});
                 console.log(`${username} joined quiz ${quizId}`);
             }
                 
@@ -110,7 +112,7 @@ io.on('connection', (socket) => {
             socket.emit('Error', { message: 'Quiz does not exist' });
         }
         
-        // if player disconects remove them from the player list
+        // if pl    ayer disconects remove them from the player list
         socket.on('disconnect', () => {
             quiz.players = quiz.players.filter((player) => player.socketId !== socket.id);
             io.to(quizId).emit("UpdatePlayers", { players: quiz.players });
@@ -163,8 +165,6 @@ const getQuestions = async (options) => {
     if (options.difficulty && options.difficulty != "Any"){
         apiLink = apiLink + "&difficulty=" + options.difficulty.toLowerCase();
     }
-
-    console.log('apiLink: ', apiLink);
 
     const questions = await fetchQuestions(apiLink);
     return questions.results;
